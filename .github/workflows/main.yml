@@ -1,0 +1,55 @@
+name: Build APKs from All Branches
+
+on:
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+
+jobs:
+  list-branches:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_list: ${{ steps.set-branches.outputs.branches }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get all remote branches
+        id: set-branches
+        run: |
+          # Get branch names, remove 'origin/', and format as a JSON array
+          BRANCHES=$(git branch -r | grep -v '\->' | sed 's/  origin\///' | jq -R -s -c 'split("\n")[:-1]')
+          echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+
+  build:
+    needs: list-branches
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: ${{ fromJson(needs: list-branches.outputs.branch_list) }}
+      fail-fast: false # Keep building other branches even if one fails
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-${{ matrix.branch }}
+          path: app/build/outputs/apk/debug/*.apk

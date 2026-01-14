@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Deep Charcoal / Midnight Blue Theme -->
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E2C</color>
+
+    <color name="electric_blue">#2979FF</color>
+    <color name="electric_blue_dark">#004ECB</color>
+
+    <color name="neon_purple">#D500F9</color>
+
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="error_red">#CF6679</color>
+</resources>
